@@ -1,0 +1,255 @@
+{
+  "info": {
+    "name": "Mentora Backend API - Complete Test Suite",
+    "_postman_id": "mentora-complete-assessment",
+    "description": "Full test suite for Mentora backend assessment. Run in order!",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "parentToken",
+      "value": ""
+    },
+    {
+      "key": "mentorToken", 
+      "value": ""
+    },
+    {
+      "key": "studentId",
+      "value": ""
+    },
+    {
+      "key": "lessonId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1️ Parent Signup",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"parent@test.com\",\n  \"password\": \"password123\",\n  \"role\": \"parent\",\n  \"name\": \"John Parent\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/signup",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "signup"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 201\", () => {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Token saved\", () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData).to.have.property('token');",
+              "  pm.collectionVariables.set('parentToken', jsonData.token);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2️ Mentor Signup", 
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw", 
+          "raw": "{\n  \"email\": \"mentor@test.com\",\n  \"password\": \"password123\",\n  \"role\": \"mentor\",\n  \"name\": \"Jane Mentor\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/signup",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "signup"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 201\", () => {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Mentor token saved\", () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.collectionVariables.set('mentorToken', jsonData.token);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3️ Create Student (Parent)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{parentToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Alice Student\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/students",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "students"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 201\", () => {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Student ID saved\", () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.collectionVariables.set('studentId', jsonData.id);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4️ Create Lesson (Mentor)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization", 
+            "value": "Bearer {{mentorToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Math Basics\",\n  \"description\": \"Algebra introduction for beginners\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/lessons",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "lessons"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 201\", () => {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Lesson ID saved\", () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.collectionVariables.set('lessonId', jsonData.id);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5️ Create Booking",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{parentToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"studentId\": \"{{studentId}}\",\n  \"lessonId\": \"{{lessonId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/bookings",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "bookings"]
+        }
+      }
+    },
+    {
+      "name": "6️ LLM Summarize (Bonus)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"The Industrial Revolution started in Britain with steam engines and factories, transforming economies worldwide.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/llm/summarize",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "llm", "summarize"]
+        }
+      }
+    },
+    {
+      "name": "7️ List Lessons (Public)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/lessons",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "lessons"]
+        }
+      }
+    }
+  ]
+}
