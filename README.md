@@ -140,4 +140,3 @@ node tests/reproduce_500.js
 ```
 
 ---
-Developed with ❤️ for the Mentora Platform.
